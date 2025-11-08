@@ -1,27 +1,21 @@
+from typing_extensions import override
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from .models import Task, CompletedTask
 from django.shortcuts import get_object_or_404
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer, CompletedTaskSerializer
 from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 from django.utils import timezone
 
 
 # Create your views here.
-class TaskList(APIView):
+class TaskList(ListCreateAPIView):
     authentication_classes = [BasicAuthentication]
-
-    def get(self, _: Request) -> Response:
-        return Response(TaskSerializer(Task.objects.all(), many=True).data)
-
-    def post(self, request: Request) -> Response:
-        task_serializer = TaskSerializer(data=request.data)
-        if not task_serializer.is_valid():
-            return Response(task_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        task_serializer.save()
-        return Response(TaskSerializer(Task.objects.all(), many=True).data)
+    serializer_class = TaskSerializer
+    queryset = Task.objects.all()
 
 
 class TaskDetail(APIView):
@@ -54,3 +48,12 @@ class TaskDetail(APIView):
         task = get_object_or_404(Task, pk=pk)
         task.delete()
         return Response(TaskSerializer(Task.objects.all(), many=True).data)
+
+class TaskHistory(ListAPIView):
+    authentication_classes = [BasicAuthentication]
+
+    @override
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        task = get_object_or_404(Task, pk=kwargs["pk"])
+        completed_tasks = task.completedtask_set.all()
+        return Response(CompletedTaskSerializer(completed_tasks, many=True).data)
