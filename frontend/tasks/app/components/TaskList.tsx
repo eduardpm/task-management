@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Task } from "../types/task";
-import TaskHistoryModal from "./TaskHistoryModal";
 
 interface TaskListProps {
   tasks: Task[];
@@ -12,18 +11,7 @@ interface TaskListProps {
 }
 
 export default function TaskList({ tasks, loading, error, onTaskUpdated }: TaskListProps) {
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-
-  const openHistory = (task: Task) => {
-    setSelectedTask(task);
-    setIsHistoryOpen(true);
-  };
-
-  const closeHistory = () => {
-    setIsHistoryOpen(false);
-    setSelectedTask(null);
-  };
+  const router = useRouter();
   const getTypeColor = (type: string) => {
     switch (type) {
       case "daily":
@@ -97,7 +85,7 @@ export default function TaskList({ tasks, loading, error, onTaskUpdated }: TaskL
         {tasks.map((task) => (
           <div
             key={task.id}
-            onClick={() => openHistory(task)}
+            onClick={() => router.push(`/tasks/${task.id}`)}
             className={`bg-white dark:bg-zinc-800 rounded-lg shadow-md hover:shadow-lg transition-all p-6 border-2 cursor-pointer ${
               task.completed_today
                 ? "border-green-500 dark:border-green-600"
@@ -157,12 +145,6 @@ export default function TaskList({ tasks, loading, error, onTaskUpdated }: TaskL
         </div>
       ))}
     </div>
-
-    <TaskHistoryModal
-      task={selectedTask}
-      isOpen={isHistoryOpen}
-      onClose={closeHistory}
-    />
   </>
   );
 }

@@ -4,10 +4,14 @@ from django.utils import timezone
 
 
 class CompletedTaskSerializer(serializers.ModelSerializer):
+    task_id = serializers.IntegerField(source="task.id", read_only=True)
+    task_title = serializers.CharField(source="task.title", read_only=True)
+    task_description = serializers.CharField(source="task.description", read_only=True)
+
     class Meta:
         model = CompletedTask
-        fields = ["id", "completed_at"]
-        read_only_fields = ["id", "completed_at"]
+        fields = ["id", "completed_at", "task_id", "task_title", "task_description"]
+        read_only_fields = ["id", "completed_at", "task_id", "task_title", "task_description"]
 
 
 class TaskSerializer(serializers.ModelSerializer):

@@ -5,6 +5,7 @@ import { Task } from "./types/task";
 import CreateTaskDialog from "./components/CreateTaskDialog";
 import TaskList from "./components/TaskList";
 import TaskHistoryOverview from "./components/TaskHistoryOverview";
+import CompletedTasksList from "./components/CompletedTasksList";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -63,6 +64,8 @@ export default function Home() {
         />
 
         <TaskHistoryOverview tasks={tasks} />
+
+        <CompletedTasksList />
 
         <CreateTaskDialog
           isOpen={isDialogOpen}
